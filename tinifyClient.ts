@@ -4,8 +4,7 @@ export class TinifyClient {
   private tinify: Tinify;
 
   constructor() {
-    const api_key = Deno.env.get("TINIFY_API_KEY") ||
-      "02wCNkHldnf83pSxRP7Gm05HwQ8FplJv";
+    const api_key = Deno.env.get("TINIFY_API_KEY") || "";
     this.tinify = new Tinify({ api_key });
   }
 
