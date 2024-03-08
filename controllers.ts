@@ -1,5 +1,5 @@
 import { TinifyClient } from "./tinifyClient.ts";
-import { creteFileResponse, getFileName, getHeaders } from "./utils.ts";
+import { creteFileResponse } from "./utils.ts";
 
 export const compressImageController = async (request: Request) => {
   const formData = await request.formData();
