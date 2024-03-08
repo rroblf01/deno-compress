@@ -1,12 +1,15 @@
-import { compressImage, serveStatic } from "./routes.ts";
+import {
+  compressImageController,
+  serveStaticController,
+} from "./controllers.ts";
 
 const handler = (request: Request) => {
   const { pathname } = new URL(request.url);
 
   if (pathname === "/compressImage") {
-    return compressImage(request);
+    return compressImageController(request);
   } else {
-    return serveStatic(request);
+    return serveStaticController(request);
   }
 };
 
