@@ -14,6 +14,16 @@ class AppCompress extends HTMLElement {
             />
             <img id="image" class="hidden" />
             <p class="text-[#6A64F1] text-center mt-3" id="sizeOldImage"></p>
+            <div>
+            <span id="qualityValue">Calidad: 50</span>
+            <input type="range" step="1" value="50" min="1" max="100" id="quality">
+            <span class="ml-5">Format: </span>
+            <select id="formatExt" class="mt-3">
+              <option value="webp">WebP</option>
+              <option value="jpeg">JPEG</option>
+              <option value="png">PNG</option>
+            </select>
+            </div>
             <button
               class="hover:shadow-form rounded-md bg-[#6A64F1] py-3 px-8 text-center text-base font-semibold text-white mt-3"
               id="buttonPost"
@@ -32,8 +42,6 @@ class AppCompress extends HTMLElement {
     </div>`;
   }
 
-
-
   connectedCallback() {
     const formApi = this.querySelector('#formApi');
     const file = this.querySelector('#file');
@@ -42,7 +50,13 @@ class AppCompress extends HTMLElement {
     const newImage = this.querySelector('#newImage');
     const sizeOldImage = this.querySelector('#sizeOldImage');
     const sizeNewImage = this.querySelector('#sizeNewImage');
+    const quality = this.querySelector('#quality');
+    const qualityValue = this.querySelector('#qualityValue');
     const buttonPost = this.querySelector('#buttonPost');
+
+    quality.addEventListener('input', (e) => {
+      qualityValue.textContent = `Calidad: ${e.target.value}`;
+    });
 
     const humanFileSize = (bytes, dp = 1) => {
       const thresh = 1024;
@@ -78,20 +92,43 @@ class AppCompress extends HTMLElement {
     formApi.addEventListener('submit', async (e) => {
       e.preventDefault();
       buttonPost.textContent = 'Loading...';
-      const formData = new FormData();
-      formData.append('file', file.files[0]);
-      const response = await fetch('/compressImage', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
+      const ext = this.querySelector('#formatExt');
+      const blob = await this.compressImage(file.files[0], quality.value, ext.value);
 
-      imageCompressed.src = data.url;
+      imageCompressed.src = URL.createObjectURL(blob);
       newImage.classList.remove('hidden');
-      sizeNewImage.textContent = `Size: ${humanFileSize(data.size)}`;
+      console.log(blob);
+      const diffPercentage = (((file.files[0].size - blob.size) / file.files[0].size) * 100).toFixed(2);
+      const message = diffPercentage > 0 ? `Reduced ${diffPercentage}%` : `Increased ${Math.abs(diffPercentage)}%`;
+      sizeNewImage.textContent = `Size: ${humanFileSize(blob.size)} (${message})`;
       buttonPost.textContent = 'Submit';
+
     });
   }
+
+  compressImage(imageAsFile, quality, ext = "webp") {
+    return new Promise((resolve, reject) => {
+      const $canvas = document.createElement("canvas");
+      const imagen = new Image();
+      imagen.onload = () => {
+        $canvas.width = imagen.width;
+        $canvas.height = imagen.height;
+        $canvas.getContext("2d").drawImage(imagen, 0, 0);
+        $canvas.toBlob(
+          (blob) => {
+            if (blob === null) {
+              return reject(blob);
+            } else {
+              resolve(blob);
+            }
+          },
+          `image/${ext}`,
+          quality / 100
+        );
+      };
+      imagen.src = URL.createObjectURL(imageAsFile);
+    });
+  };
 
 }
 
