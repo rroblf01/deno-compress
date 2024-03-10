@@ -16,7 +16,6 @@ class AppCompress extends HTMLElement {
               name="file"
             />
             <img id="hidenImage" class="hidden" />
-            <p class="text-[#6A64F1] text-center mt-3" id="sizeOldImage"></p>
             <div>
             <span id="qualityValue">Calidad: 50</span>
             <input type="range" step="1" value="50" min="1" max="100" id="quality">
@@ -29,6 +28,7 @@ class AppCompress extends HTMLElement {
             </div>
             <span id="sizeValue">Size: 100</span>
             <input type="range" step="1" value="100" min="1" max="100" id="size">
+            <p class="text-[#6A64F1] text-center mt-3" id="sizeOldImage"></p>
             <img id="image" class="hidden" />
             <div>
             </div>
