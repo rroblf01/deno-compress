@@ -15,7 +15,6 @@ class AppCompress extends HTMLElement {
               id="file"
               name="file"
             />
-            <img id="image" class="hidden" />
             <img id="hidenImage" class="hidden" />
             <p class="text-[#6A64F1] text-center mt-3" id="sizeOldImage"></p>
             <div>
@@ -23,14 +22,15 @@ class AppCompress extends HTMLElement {
             <input type="range" step="1" value="50" min="1" max="100" id="quality">
             <span class="ml-5">Format: </span>
             <select id="formatExt" class="mt-3">
-              <option value="webp">WebP</option>
-              <option value="jpeg">JPEG</option>
-              <option value="png">PNG</option>
+            <option value="webp">WebP</option>
+            <option value="jpeg">JPEG</option>
+            <option value="png">PNG</option>
             </select>
             </div>
-            <div>
             <span id="sizeValue">Size: 100</span>
             <input type="range" step="1" value="100" min="1" max="100" id="size">
+            <img id="image" class="hidden" />
+            <div>
             </div>
             <button
               class="hover:shadow-form rounded-md bg-[#6A64F1] py-3 px-8 text-center text-base font-semibold text-white mt-3"
@@ -41,7 +41,7 @@ class AppCompress extends HTMLElement {
           </div>
         </form>
 
-        <div class="mt-8 hidden" id="newImage">
+        <div class="mt-8 hidden flex flex-col items-center justify-center" id="newImage">
           <h1 class="text-3xl font-bold text-[#6A64F1] text-center mb-8"> Image Compressed</h1>
           <p class="text-[#6A64F1] text-center mt-3" id="sizeNewImage"></p>
           <img id="imageCompressed" />
@@ -110,7 +110,6 @@ class AppCompress extends HTMLElement {
 
       const ext = this.querySelector('#formatExt');
       const fileForm = e.target.file.files[0];
-      const hidenImage = this.querySelector('#hidenImage');
       const blob = await this.compressImage(fileForm, quality.value, ext.value);
 
       this.querySelector('#imageCompressed').src = URL.createObjectURL(blob);
@@ -130,7 +129,7 @@ class AppCompress extends HTMLElement {
       const imagen = new Image();
       const imageResize = document.getElementById('image');
       this.querySelector('#size')
-      imagen.onload = (e) => {
+      imagen.onload = () => {
         $canvas.width = imageResize.width;
         $canvas.height = imageResize.height;
         $canvas.getContext("2d").drawImage(imagen, 0, 0, imageResize.width, imageResize.height);
