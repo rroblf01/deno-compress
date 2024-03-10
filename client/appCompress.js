@@ -43,64 +43,59 @@ class AppCompress extends HTMLElement {
   }
 
   connectedCallback() {
-    const formApi = this.querySelector('#formApi');
     const file = this.querySelector('#file');
     const image = this.querySelector('#image');
-    const imageCompressed = this.querySelector('#imageCompressed');
-    const newImage = this.querySelector('#newImage');
-    const sizeOldImage = this.querySelector('#sizeOldImage');
-    const sizeNewImage = this.querySelector('#sizeNewImage');
-    const quality = this.querySelector('#quality');
-    const qualityValue = this.querySelector('#qualityValue');
-    const buttonPost = this.querySelector('#buttonPost');
 
-    quality.addEventListener('input', (e) => {
+    this.querySelector('#quality').addEventListener('input', (e) => {
+      const qualityValue = this.querySelector('#qualityValue');
       qualityValue.textContent = `Calidad: ${e.target.value}`;
     });
 
     const humanFileSize = (bytes, dp = 1) => {
       const thresh = 1024;
+      const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
       if (Math.abs(bytes) < thresh) {
         return bytes + ' B';
       }
 
-      const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       let u = -1;
       const r = 10 ** dp;
-
       do {
         bytes /= thresh;
         ++u;
       } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
 
-
       return bytes.toFixed(dp) + ' ' + units[u];
     }
 
     file.addEventListener('change', (e) => {
-      const file = e.target.files[0];
+      const fileTarget = e.target.files[0];
       const reader = new FileReader();
+      const sizeOldImage = this.querySelector('#sizeOldImage');
+
       reader.onload = function (e) {
         image.src = e.target.result;
         image.classList.remove('hidden');
-        sizeOldImage.textContent = `Size: ${humanFileSize(file.size)}`;
+        sizeOldImage.textContent = `Size: ${humanFileSize(fileTarget.size)}`;
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(fileTarget);
     });
 
-    formApi.addEventListener('submit', async (e) => {
+    this.querySelector('#formApi').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const buttonPost = this.querySelector('#buttonPost');
       buttonPost.textContent = 'Loading...';
+
       const ext = this.querySelector('#formatExt');
       const blob = await this.compressImage(file.files[0], quality.value, ext.value);
 
-      imageCompressed.src = URL.createObjectURL(blob);
-      newImage.classList.remove('hidden');
-      console.log(blob);
+      this.querySelector('#imageCompressed').src = URL.createObjectURL(blob);
+      this.querySelector('#newImage').classList.remove('hidden');
       const diffPercentage = (((file.files[0].size - blob.size) / file.files[0].size) * 100).toFixed(2);
       const message = diffPercentage > 0 ? `Reduced ${diffPercentage}%` : `Increased ${Math.abs(diffPercentage)}%`;
-      sizeNewImage.textContent = `Size: ${humanFileSize(blob.size)} (${message})`;
+
+      this.querySelector('#sizeNewImage').textContent = `Size: ${humanFileSize(blob.size)} (${message})`;
       buttonPost.textContent = 'Submit';
 
     });
